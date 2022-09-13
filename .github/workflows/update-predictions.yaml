@@ -26,6 +26,7 @@ jobs:
         with:
            extra-packages: |
             nflverse/nflreadr
+            jthomasmock/espnscrapeR
             mrcaseb/mrcaseb
 
       - name: Compute and Submit Predictions
