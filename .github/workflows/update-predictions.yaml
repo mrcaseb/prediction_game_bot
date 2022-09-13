@@ -23,11 +23,6 @@ jobs:
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
            extra-packages: |
-            httr2,
-            xml2,
-            cli,
-            dplyr,
-            purrr,
             nflverse/nflreadr
 
       - name: Compute and Submit Predictions
