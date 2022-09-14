@@ -17,7 +17,6 @@ implied_prob <- function(..., wager = NULL, tax = FALSE, overround_limit = 1e-5,
     dplyr::mutate(
       implied = ifelse(odd >= 0, 100 / (odd + 100), -odd / (-odd + 100)),
       prob_vig_removed = remove_vig_power(implied, overround_limit = overround_limit, verbose = verbose, sum_to = sum_to),
-      prob = scales::percent(prob_vig_removed, accuracy = 0.1),
       decimal = ifelse(odd >= 0, 1 + odd / 100, 1 - 100 / odd)
     ) |>
     dplyr::select(odd, implied, prob_vig_removed, prob, decimal)
