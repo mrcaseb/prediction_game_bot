@@ -1,3 +1,5 @@
+source("R/utils.R")
+
 get_ids_to_predict <- function(){
   httr2::request("https://nflgamedata.com/predict/picks.php") |>
     httr2::req_perform() |>
@@ -12,9 +14,9 @@ compute_sebs_predictions <- function(game_ids_to_predict){
     dplyr::select(game_id, home_team, home_moneyline, away_moneyline) |>
     dplyr::rowwise() |>
     dplyr::mutate(
-      home_odd = mrcaseb::implied_prob(home_moneyline)$implied,
-      away_odd = mrcaseb::implied_prob(away_moneyline)$implied,
-      non_vig = list(mrcaseb::implied_prob(dplyr::c_across(c(home_moneyline, away_moneyline)))$prob_vig_removed)
+      home_odd = implied_prob(home_moneyline)$implied,
+      away_odd = implied_prob(away_moneyline)$implied,
+      non_vig = list(implied_prob(dplyr::c_across(c(home_moneyline, away_moneyline)))$prob_vig_removed)
     ) |>
     dplyr::mutate(
       home_non_vig = round(100 * non_vig[[1]], 0),
