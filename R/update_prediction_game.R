@@ -22,8 +22,8 @@ compute_sebs_predictions <- function(game_ids_to_predict){
       home_non_vig = round(100 * non_vig[[1]], 0),
       away_non_vig = round(100 * non_vig[[2]], 0),
       sebs_pred = dplyr::case_when(
-        home_non_vig > 50 ~ home_non_vig + 3,
-        home_non_vig < 50 ~ home_non_vig - 3,
+        home_non_vig > 50 ~ home_non_vig - 5,
+        home_non_vig < 50 ~ home_non_vig + 5,
         TRUE ~ home_non_vig
       )
     ) |>
