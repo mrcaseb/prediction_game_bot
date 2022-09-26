@@ -15,7 +15,7 @@ implied_prob <- function(..., wager = NULL, tax = FALSE, overround_limit = 1e-5,
   odds <- list(...) |> unlist()
   data.frame("odd" = odds) |>
     dplyr::mutate(
-      implied = ifelse(odd >= 0, 100 / (odd + 100), -odd / (-odd + 100)),
+      implied = dplyr::if_else(odd >= 0, 100 / (odd + 100), -odd / (-odd + 100), missing = 0.5),
       prob_vig_removed = remove_vig_power(implied, overround_limit = overround_limit, verbose = verbose, sum_to = sum_to),
       decimal = ifelse(odd >= 0, 1 + odd / 100, 1 - 100 / odd)
     ) |>
