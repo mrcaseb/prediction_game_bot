@@ -1,10 +1,10 @@
 on:
-  schedule:
-    - cron:  '0 0,1,2,21-23 * 1,2,9-12 TUE'
-    - cron:  '0 0,1,2,5 * 1,2,9-12 TUE'
-    - cron:  '45 21-23 * 1,2,9-12 THU'
-    - cron:  '0 0,1,2 * 1,2,9-12 FRI'
-    - cron:  '15,30,45 15-23 * 1,2,9-12 SUN'
+  #schedule:
+   # - cron:  '0 0,1,2,21-23 * 1,2,9-12 TUE'
+   # - cron:  '0 0,1,2,5 * 1,2,9-12 TUE'
+   # - cron:  '45 21-23 * 1,2,9-12 THU'
+   # - cron:  '0 0,1,2 * 1,2,9-12 FRI'
+   # - cron:  '15,30,45 15-23 * 1,2,9-12 SUN'
   workflow_dispatch:
 
 name: Update Predictions
