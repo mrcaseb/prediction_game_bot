@@ -8,24 +8,23 @@ get_ids_to_predict <- function(){
     xml2::xml_attr("id")
 }
 
-compute_sebs_predictions <- function(game_ids_to_predict){
+compute_sebs_predictions <- function(game_ids_to_predict, pred_model){
   predictions <- nflreadr::load_schedules() |>
     dplyr::filter(game_id %in% game_ids_to_predict) |>
-    dplyr::select(game_id, home_team, home_moneyline, away_moneyline) |>
-    dplyr::rowwise() |>
+    dplyr::select(game_id, home_team, away_team, home_moneyline, away_moneyline, result) |>
     dplyr::mutate(
       home_odd = implied_prob(home_moneyline)$implied,
-      away_odd = implied_prob(away_moneyline)$implied,
-      non_vig = list(implied_prob(dplyr::c_across(c(home_moneyline, away_moneyline)))$prob_vig_removed)
+      away_odd = implied_prob(away_moneyline)$implied
     ) |>
+    nflreadr::clean_homeaway() |>
     dplyr::mutate(
-      home_non_vig = round(100 * non_vig[[1]], 0),
-      away_non_vig = round(100 * non_vig[[2]], 0),
-      sebs_pred = dplyr::case_when(
-        home_non_vig > 50 ~ home_non_vig - 5,
-        home_non_vig < 50 ~ home_non_vig + 5,
-        TRUE ~ home_non_vig
-      )
+      non_vig = implied_prob(team_moneyline)$prob_vig_removed,
+      .by = game_id
+    ) |>
+    dplyr::filter(location == "home") |>
+    dplyr::mutate(
+      home_non_vig = round(100 * non_vig, 0),
+      sebs_pred = predict(pred_model, home_non_vig) |> round(0)
     ) |>
     dplyr::select(-non_vig)
   cli::cli_alert_info("We'll use this for predictions:")
@@ -35,31 +34,27 @@ compute_sebs_predictions <- function(game_ids_to_predict){
 
 submit_prediction <- function(game_id_to_predict, home_prediction, home_team){
   cli::cli_progress_step("Set {.val {game_id_to_predict}} to {.val {home_prediction}}% {.val {home_team}} win.")
-  cookie <- paste0(
-    "PHPSESSID=", Sys.getenv("PHPSESSID"),
-    "; ",
-    "nflgamedata_twitter_guid=", Sys.getenv("NFLGAMEDATA_TWITTER_GUID")
-  )
   httr2::request("https://nflgamedata.com/predict/set_prediction.php") |>
     httr2::req_method("POST") |>
     httr2::req_url_query(
       game_id = game_id_to_predict,
       prediction = home_prediction
     ) |>
-    httr2::req_headers(cookie = cookie) |>
+    httr2::req_headers(cookie = Sys.getenv("SEBS_GOOGLE_PREDICTION_GAME_COOKIE")) |>
     httr2::req_perform()
   # let's be nice to Lee's server
   Sys.sleep(1)
 }
 
 ids <- get_ids_to_predict()
-sebs_preds <- compute_sebs_predictions(ids)
+prediction_game_model <- readRDS("R/prediction_game_model.rds")
+sebs_preds <- compute_sebs_predictions(ids, pred_model = prediction_game_model)
 
 purrr::pwalk(
   list(
     game_id_to_predict = sebs_preds$game_id,
     home_prediction = sebs_preds$sebs_pred,
-    home_team = sebs_preds$home_team
+    home_team = sebs_preds$team
   ),
   submit_prediction
 )
