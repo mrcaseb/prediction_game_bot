@@ -33,17 +33,22 @@ compute_sebs_predictions <- function(game_ids_to_predict, pred_model){
 }
 
 submit_prediction <- function(game_id_to_predict, home_prediction, home_team){
-  cli::cli_progress_step("Set {.val {game_id_to_predict}} to {.val {home_prediction}}% {.val {home_team}} win.")
-  httr2::request("https://nflgamedata.com/predict/set_prediction.php") |>
+  cli::cli_progress_step(
+    msg = "Set {.val {game_id_to_predict}} to {.val {home_prediction}}% {.val {home_team}} win.",
+    msg_failed = "Invalid Authorization cookie or Game ID"
+  )
+  resp <- httr2::request("https://nflgamedata.com/predict/set_prediction.php") |>
     httr2::req_method("POST") |>
     httr2::req_url_query(
       game_id = game_id_to_predict,
       prediction = home_prediction
     ) |>
     httr2::req_headers(cookie = Sys.getenv("SEBS_GOOGLE_PREDICTION_GAME_COOKIE")) |>
-    httr2::req_perform()
+    httr2::req_perform() |>
+    httr2::resp_body_string()
   # let's be nice to Lee's server
   Sys.sleep(1)
+  if (!grepl("^SUCCESS", resp)) stop("submission failed")
 }
 
 ids <- get_ids_to_predict()
@@ -56,5 +61,5 @@ purrr::pwalk(
     home_prediction = sebs_preds$sebs_pred,
     home_team = sebs_preds$team
   ),
-  submit_prediction
+  purrr::possibly(submit_prediction, quiet = TRUE)
 )
