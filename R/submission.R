@@ -1,5 +1,3 @@
-source("R/utils.R")
-
 get_ids_to_predict <- function(){
   httr2::request("https://nflgamedata.com/predict/picks.php") |>
     httr2::req_perform() |>
@@ -66,16 +64,3 @@ submit_prediction <- function(game_id_to_predict, home_prediction, home_team){
   Sys.sleep(1)
   if (!grepl("^SUCCESS", resp)) stop("submission failed")
 }
-
-ids <- get_ids_to_predict()
-prediction_game_model <- readRDS("R/prediction_game_model.rds")
-sebs_preds <- compute_sebs_predictions(ids, pred_model = prediction_game_model)
-
-purrr::pwalk(
-  list(
-    game_id_to_predict = sebs_preds$game_id,
-    home_prediction = sebs_preds$sebs_pred,
-    home_team = sebs_preds$team
-  ),
-  purrr::possibly(submit_prediction, quiet = TRUE)
-)
