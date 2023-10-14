@@ -28,6 +28,7 @@ jobs:
             local::.
             nflverse/nflreadr
             mrcaseb/pinnacler
+            any::pkgload
 
       - name: Compute and Submit Predictions
         run: Rscript -e 'source("auto/update_prediction_game.R")'

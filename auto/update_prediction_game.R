@@ -1,3 +1,5 @@
+pkgload::load_all()
+
 ids <- get_ids_to_predict()
 prediction_game_model <- readRDS("auto/prediction_game_model.rds")
 sebs_preds <- compute_sebs_predictions(ids, pred_model = prediction_game_model)
