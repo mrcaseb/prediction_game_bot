@@ -15,7 +15,8 @@ compute_sebs_predictions <- function(game_ids_to_predict, pred_model){
       game_id = game_ids_to_predict,
       pinnacle_away_money_line = NA,
       pinnacle_home_money_line = NA
-    )
+    ),
+    quiet = FALSE
   )()
   predictions <- nflreadr::load_schedules() |>
     dplyr::filter(game_id %in% game_ids_to_predict) |>

@@ -23,6 +23,7 @@ implied_prob <- function(..., wager = NULL, tax = FALSE, overround_limit = 1e-5,
 }
 
 fetch_pinnacle_moneylines <- function(){
+  cli::cli_progress_step("Fetch Pinnacle moneylines")
   matchups <-
     pinnacler::pinnacle_get_raw_matchups() |>
     pinnacler::pinnacle_parse_matchups()
