@@ -1,4 +1,4 @@
-Package: prediction_game_bot
+Package: predictiongamebot
 Title: What the Package Does (One Line, Title Case)
 Version: 0.0.0.9001
 Authors@R: 
@@ -16,4 +16,4 @@ Imports:
     xml2
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3

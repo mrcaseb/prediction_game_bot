@@ -68,4 +68,5 @@ fetch_pinnacle_moneylines <- function(){
   moneylines
 }
 
+#' @export
 `%na%` <- function(x, y) ifelse(is.na(x), y, x)
