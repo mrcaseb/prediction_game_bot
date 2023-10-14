@@ -9,12 +9,27 @@ get_ids_to_predict <- function(){
 }
 
 compute_sebs_predictions <- function(game_ids_to_predict, pred_model){
+  pinnacle_odds <- purrr::possibly(
+    .f = fetch_pinnacle_moneylines,
+    otherwise = data.frame(
+      game_id = game_ids_to_predict,
+      pinnacle_away_money_line = NA,
+      pinnacle_home_money_line = NA
+    )
+  )()
   predictions <- nflreadr::load_schedules() |>
     dplyr::filter(game_id %in% game_ids_to_predict) |>
     dplyr::select(game_id, home_team, away_team, home_moneyline, away_moneyline, result) |>
+    dplyr::left_join(
+      pinnacle_odds, by = "game_id"
+    ) |>
     dplyr::mutate(
+      home_moneyline = pinnacle_home_money_line %na% home_moneyline,
+      away_moneyline = pinnacle_away_money_line %na% away_moneyline,
       home_odd = implied_prob(home_moneyline)$implied,
-      away_odd = implied_prob(away_moneyline)$implied
+      away_odd = implied_prob(away_moneyline)$implied,
+      pinnacle_home_money_line = NULL,
+      pinnacle_away_money_line = NULL
     ) |>
     nflreadr::clean_homeaway() |>
     dplyr::mutate(

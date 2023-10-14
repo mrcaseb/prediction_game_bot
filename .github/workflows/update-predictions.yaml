@@ -26,6 +26,7 @@ jobs:
         with:
            extra-packages: |
             nflverse/nflreadr
+            mrcaseb/pinnacler
 
       - name: Compute and Submit Predictions
         run: Rscript -e 'source("R/update_prediction_game.R")'

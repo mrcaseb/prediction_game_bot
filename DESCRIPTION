@@ -12,6 +12,7 @@ Imports:
     httr2,
     nflreadr,
     purrr,
+    tidyr,
     xml2
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
